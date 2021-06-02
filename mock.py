@@ -28,11 +28,11 @@ def add_block(b1, b2, pos_v, pos_h):
     h_range2 = slice(max(0, -pos_h), min(-pos_h + b1.shape[1], b2.shape[1]))
     b1[v_range1, h_range1] += b2[v_range2, h_range2]
 
-def Gaussian_clumps(n_clumps, nx, ny=0, amp=[1], sigma=[], x=[], y=[], fact=3, verbose=False):
+def Gaussian_clumps(n_clumps, nx, ny=0, amp=[1], sigma=[], fact=3, x=[], y=[], dx=[], dy=[], delta=0, verbose=False):
     """
-    Generates a 2D array of size `nx` by `ny` with `n_clumps` clumps of amplitude `amp` and std dev `sigma` at positions `x`,`y`
+    Generates a 2D array of size `nx` by `ny` with `n_clumps` clumps of amplitude `amp` and std dev `sigma` at positions `x`,`y` with spread `dx`,`dy`
     Lengths `x`, `y`, `sigma` are expressed as a fraction of the box lengths nx, ny, min(nx,ny)
-    If arrays `amp`, `sigma`, `x`, `y` are of length 1 they are repeated to match `n_clumps`
+    If arrays `amp`, `sigma`, `x`, `y`, `dx`, `dy` are of length 1 they are repeated to match `n_clumps`
     If they are left empty they are chosen randomly in [0,1]
     """
     if ny==0: ny=nx
@@ -41,17 +41,21 @@ def Gaussian_clumps(n_clumps, nx, ny=0, amp=[1], sigma=[], x=[], y=[], fact=3, v
     if len(sigma)==1: sigma = sigma*n_clumps
     if len(x    )==1: x     = x    *n_clumps
     if len(y    )==1: y     = y    *n_clumps
+    if len(dx   )==1: dx    = dx   *n_clumps
+    if len(dy   )==1: dy    = dy   *n_clumps
     if len(amp  )==0: amp   = np.random.rand(n_clumps)
     if len(sigma)==0: sigma = np.random.rand(n_clumps)
     if len(x    )==0: x     = np.random.rand(n_clumps)
     if len(y    )==0: y     = np.random.rand(n_clumps)
+    if len(dx   )==0: dx    = np.random.rand(n_clumps)*2 - 1
+    if len(dy   )==0: dy    = np.random.rand(n_clumps)*2 - 1
     arr = np.zeros((nx,ny))
     for ic in range(n_clumps):
         isigma = int(sigma[ic]*min(nx,ny))
         if isigma>0:
             clump = amp[ic] * Gaussian_clump(isigma, fact*isigma)
-            pos_v = int(x[ic]*nx) - fact*isigma
-            pos_h = int(y[ic]*ny) - fact*isigma
+            pos_v = int((x[ic]+delta*dx[ic])*nx) - fact*isigma
+            pos_h = int((y[ic]+delta*dy[ic])*ny) - fact*isigma
             add_block(arr, clump, pos_v, pos_h)
     if verbose and s>0: print "typical size = %3i -> f_max = %.1f"%(s,min(nx,ny)/float(2*s))
     return arr

@@ -4,6 +4,7 @@ method 1: Gaussian clumps
 method 2: Gaussian fields
 """
 
+from __future__ import print_function
 import numpy as np
 
 #------------------------------
@@ -57,7 +58,7 @@ def Gaussian_clumps(n_clumps, nx, ny=0, amp=[1], sigma=[], fact=3, x=[], y=[], d
             pos_v = int((x[ic]+delta*dx[ic])*nx) - fact*isigma
             pos_h = int((y[ic]+delta*dy[ic])*ny) - fact*isigma
             add_block(arr, clump, pos_v, pos_h)
-    if verbose and s>0: print "typical size = %3i -> f_max = %.1f"%(s,min(nx,ny)/float(2*s))
+    if verbose and s>0: print("typical size = %3i -> f_max = %.1f"%(s,min(nx,ny)/float(2*s)))
     return arr
 
 #------------------------------

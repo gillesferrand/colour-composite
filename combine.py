@@ -4,6 +4,7 @@ method 1: RGB()
 method 2: colourize() and blend()
 """
 
+from __future__ import print_function
 import numpy as np
 import matplotlib as mpl
 
@@ -16,7 +17,7 @@ def norm(layer, min=None, max=None):
     if min==None: min = layer.min()
     if max==None: max = layer.max()
     if max-min==0:
-        print "min must be different from max"
+        print("min must be different from max")
         return
     layer_norm = (layer.copy()-min)/(max-min)
     return layer_norm
@@ -26,7 +27,7 @@ def RGB(layers, weights=[1], min=[None], max=[None]):
         Each layer is first normalized from [min, max] to [0,1], and optionally weighted.
     """
     if len(layers)!=3:
-        print "You must provide exactly 3 layers"
+        print("You must provide exactly 3 layers")
         return
     if len(weights)==1: weights = weights *3
     if len(min)    ==1: min     = min     *3
@@ -89,7 +90,7 @@ def colourize_HSV_list(layers, H, S, V, min=[None], max=[None]):
 
 #-------------------------------------------------------------------------------
 
-def blend(layers, mode):
+def blend(layers, mode, norm=True):
     """ Blends any number of coloured `layers` using the specified `mode`.
        `layers` is a list of (n,m,3) arrays
        `mode` is a function of 2 layers, like the ones listed below
@@ -100,6 +101,7 @@ def blend(layers, mode):
     for i in range(3):
         for j in range(len(layers)):
             image_RGB[:,:,i] = mode(layers[j][:,:,i], image_RGB[:,:,i])
+        if norm: image_RGB[:,:,i] /= image_RGB[:,:,i].max()
     return image_RGB
 
 # blending modes
